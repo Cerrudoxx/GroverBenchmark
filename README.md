@@ -20,7 +20,7 @@ Each simulator folder (`qsimov/`, `qibo/`, `qiskit/`, `qulacs/`) includes a `REA
 ## How to Use
 1. **Clone the Repository**:
    ```bash
-   git clone [https://github.com/Cerrudoxx/GroverBenchmark.git]
+   git clone https://github.com/Cerrudoxx/GroverBenchmark.git
    ```
 2. **Install Dependencies**: Ensure Python and the required libraries (e.g., `qsimov`, `qibo`, `qiskit`, `qulacs`, `numpy`, `time`) are installed. Refer to each simulator’s `README.md` for specific requirements.
 3. **Run the Scripts**: Follow the instructions in the respective simulator folders to execute the simulations.

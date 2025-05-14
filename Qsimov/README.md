@@ -1,129 +1,147 @@
-# Simulación del Algoritmo de Grover con QSimov
+# Grover's Algorithm Simulation with Qsimov
 
-Esta aplicación implementa el algoritmo de Grover utilizando la biblioteca **QSimov** para simulación cuántica. Además de ejecutar el algoritmo, mide el tiempo de ejecución y la desviación estándar de múltiples ejecuciones, monitorea el uso de CPU y RAM, guarda los resultados en archivos CSV y genera gráficos del uso de RAM a lo largo del tiempo. La salida en la consola se enriquece mediante la biblioteca **Rich**.
-## Requisitos y Dependencias
-Para ejecutar esta aplicación, necesitas instalar las siguientes dependencias:
+This application implements Grover's algorithm using the **Qsimov** library for quantum simulation. It measures execution time and standard deviation across multiple runs, monitors CPU and RAM usage, saves results to CSV files, and generates plots of RAM usage and execution times as a function of the number of qubits and iterations. The console output is enhanced using the **Rich** library for improved visualization.
+
+## Requirements and Dependencies
+
+To run this application, you need to install the following dependencies with the specified versions:
 
 - **Python**: 3.8.20
-- **qsimov**: desde el repositorio [QSimov](https://github.com/Mowstyl/QSimov)
-- **numpy**: 1.24.4
-- **rich**
 - **psutil**: 7.0.0
-- **matplotlib**
+- **numpy**: 1.24.4
+- **matplotlib**: 3.5.1
+- **rich**: (version not specified, but required for enhanced console output)
+- **qsimov**: 5.1.3
 
-Asegúrate de usar estas versiones para garantizar la compatibilidad.
+Ensure you use compatible versions to avoid dependency conflicts.
 
-## Instalación
+## Installation
 
-1. **Clonar el repositorio** (si aplica) o descargar los archivos al directorio de trabajo.
-2. **Instalar las dependencias**:
-    - Usa `pip` para instalarlas manualmente:
+1. **Clone the repository** (if applicable) or download the files to your working directory.
+2. **Install the dependencies**:
+    - Use `pip` to install them manually:
       ```bash
-      pip install numpy==1.24.4 rich psutil==7.0.0 matplotlib
+      pip install psutil==5.9.0 numpy==2.0.2 qsimov matplotlib==3.5.0 rich
       ```
-    - Instalar qsimov desde el repositorio:
-      ```bash
-      git clone https://github.com/Mowstyl/QSimov
-      ```
-      Sigue los pasos que se especifican en dicho repositorio para su instalación.
-      
-    - Si existe un archivo requirements.txt, puedes usar:
+    - If a `requirements.txt` file exists, you can use:
       ```bash
       pip install -r requirements.txt
       ```
 
-## Uso
+## Usage
 
-La aplicación se ejecuta desde la línea de comandos con el script principal (`grover-qsimov-main.py`) y acepta los siguientes argumentos:
+The application is executed from the command line using the main script (`grover_qsimov_main.py`) and accepts the following arguments:
 
-- `n`: Número de qubits o rango de qubits (por ejemplo, '4' o '4-7').
-- `num_iterations`: Número de iteraciones o rango de iteraciones (por ejemplo, '512' o '512-1024').
-- `--cores`: Número de núcleos de CPU a utilizar (por defecto, usa todos los núcleos disponibles).
-- `--no-ram`: Deshabilita el monitoreo de RAM.
-- `--no-cpu`: Deshabilita el monitoreo de CPU.
+- `n`: Number of qubits or range of qubits (e.g., '4' or '4-7'). Must be greater than 2.
+- `num_iterations`: Number of iterations or range of iterations (e.g., '512' or '512-1024'). Must be non-zero.
+- `--cores`: Number of CPU cores to use (defaults to -1, which uses all available cores).
+- `--no-ram`: Disables real-time RAM monitoring.
+- `--no-cpu`: Disables CPU monitoring.
 
-### Ejemplos de Ejecución
+### Execution Examples
 
-Ejecutar con 4 qubits, 512 iteraciones y todos los núcleos disponibles:
+Run with 4 qubits, 512 iterations, and all available cores:
 ```bash
-python grover-qsimov-main.py 4 512
+python grover_qsimov_main.py 4 512
 ```
 
-Ejecutar con un rango de qubits de 4 a 7, un rango de iteraciones de 512 a 1024 y 2 núcleos:
+Run with a qubit range from 4 to 7, iterations from 512 to 1024, and 2 cores:
 ```bash
-python grover-qsimov-main.py 4-7 512-1024 --cores 2
+python grover_qsimov_main.py 4-7 512-1024 --cores 2
 ```
 
-Ejecutar con 5 qubits, 512 iteraciones sin monitoreo de RAM:
+Run with 5 qubits, 512 iterations, and no RAM monitoring:
 ```bash
-python grover-qsimov-main.py 5 512 --no-ram
+python grover_qsimov_main.py 5 512 --no-ram
 ```
 
-## Descripción de las Clases Principales
+## Description of Main Classes and Modules
 
 ### GroverRunner (`grover_runner.py`)
 
-- **Propósito**: Construye y ejecuta el circuito cuántico del algoritmo de Grover, midiendo su rendimiento.
-- **Parámetros de Entrada**:
-     - `n`: Número de qubits.
-     - `num_iterations`: Número de iteraciones.
-     - `cores`: Número de núcleos de CPU.
-     - `ram_monitor`: Instancia de `RAMMonitor` (o `None` si no se usa).
-     - `cpu_monitor`: Instancia de `CPUMonitor` (o `None` si no se usa).
-     - `console`: Objeto `Console` de Rich para la salida.
-- **Métodos Clave**:
-     - `_build_circuit()`: Construye el circuito de Grover con el número óptimo de iteraciones.
-     - `_run_simulation(num_iterations)`: Ejecuta la simulación varias veces y devuelve los tiempos en nanosegundos.
-     - `run()`: Ejecuta el algoritmo, calcula estadísticas (tiempo medio, desviación estándar, uso de CPU/RAM) y devuelve un diccionario con los resultados.
+- **Purpose**: Constructs and executes the quantum circuit for Grover's algorithm using Qsimov's `QCircuit` and `Drewom` executor, measuring its performance.
+- **Input Parameters**:
+  - `n`: Number of qubits.
+  - `num_iterations`: Number of iterations for the simulation.
+  - `cores`: Number of CPU cores.
+  - `ram_monitor`: Instance of `RAMMonitor` (or `None` if not used).
+  - `cpu_monitor`: Instance of `CPUMonitor` (or `None` if not used).
+  - `console`: `Console` object from Rich for output.
+  - `ram_csv_file`: Path to the CSV file for saving real-time RAM usage.
+- **Key Methods**:
+  - `_build_circuit()`: Constructs the Grover circuit with the optimal number of iterations using Hadamard (`H`), Pauli-X (`X`), and controlled-Z (`Z`) gates for the oracle and diffuser, followed by measurement.
+  - `_run_simulation(num_executions)`: Runs the simulation multiple times using Qsimov's `Drewom` executor and returns execution times in nanoseconds.
+  - `run()`: Executes the algorithm, calculates statistics (average time, standard deviation, CPU/RAM usage), and returns a dictionary with results. Stops execution if the estimated time exceeds one day (8640 seconds).
 
 ### ResultsHandler (`results_handler.py`)
 
-- **Propósito**: Maneja la visualización de resultados en tablas y su guardado en archivos CSV.
-- **Parámetros de Entrada**:
-     - `file_name`: Nombre base del archivo CSV.
-     - `results_dir`: Directorio donde se guardan los resultados.
-    - `console`: Objeto `Console` de Rich.
-- **Métodos Clave**:
-    - `save_to_csv(data)`: Guarda los datos en un archivo CSV.
-    - `display_timing_table(data)`: Muestra una tabla con el tiempo medio y la desviación estándar.
-    - `display_usage_table(data)`: Muestra una tabla con el uso promedio de CPU y RAM.
-    - `save_console_output()`: Guarda la salida de la consola en un archivo `out.txt`.
+- **Purpose**: Manages the visualization of results in tables and saves them to CSV files.
+- **Input Parameters**:
+  - `file_name`: Base name of the CSV file.
+  - `results_dir`: Directory where results are saved.
+  - `console`: `Console` object from Rich.
+- **Key Methods**:
+  - `_ensure_csv_headers()`: Ensures the CSV file has headers if it is new.
+  - `save_to_csv(data)`: Appends data to the CSV file.
+  - `display_timing_table(data)`: Displays a table with average execution time and standard deviation.
+  - `display_usage_table(data)`: Displays a table with average CPU and RAM usage, RAM usage in MB, and peak RAM usage.
+  - `save_console_output()`: Saves the console output to an `out.txt` file.
 
-### CPUMonitor y RAMMonitor (`ResourceMonitor.py`)
+### CPUMonitor and RAMMonitor (`ResourceMonitor.py`)
 
-- **Propósito**: Monitorean el uso de CPU y RAM, respectivamente, durante la ejecución.
-- **Parámetros de Entrada**:
-    - `interval`: Intervalo de muestreo en segundos (por defecto, 0.1).
-- **Métodos Clave**:
-    - `start()`: Inicia el monitoreo en un hilo separado.
-    - `stop()`: Detiene el monitoreo.
-    - `average()`: Devuelve el promedio de las lecturas.
-    - `max_memory_usage()` (solo `RAMMonitor`): Devuelve el pico máximo de uso de RAM.
-    - `memory_usage_in_mb()` (solo `RAMMonitor`): Devuelve el uso de RAM en MB.
-    - `real_time_memory_usage(file_name)` (solo `RAMMonitor`): Monitorea y guarda el uso de RAM en tiempo real en un archivo CSV.
+- **Purpose**: Monitor CPU and RAM usage, respectively, during execution.
+- **Input Parameters**:
+  - `interval`: Sampling interval in seconds (default is 0.1).
+- **Key Methods**:
+  - `start()`: Starts monitoring in a separate thread.
+  - `stop()`: Stops monitoring and joins the thread.
+  - `average()`: Returns the average of the collected readings.
+  - `max_memory_usage()` (only `RAMMonitor`): Returns the peak RAM usage as a percentage.
+  - `memory_usage_in_mb()` (only `RAMMonitor`): Returns the current RAM usage in MB.
+  - `max_memory_usage_in_mb()` (only `RAMMonitor`): Returns the peak RAM usage in MB.
+  - `real_time_memory_usage(file_name)` (only `RAMMonitor`): Monitors and saves real-time RAM usage to a CSV file.
+  - `plot_ram_usage_from_csv(file_name)`: Generates a plot of RAM usage over time from a CSV file.
+  - `plot_ram_avg_from_results(file_name)`: Generates a plot of average RAM usage vs. number of qubits.
+  - `plot_t_grover_from_csv(file_name)`: Generates a plot of Grover's execution time vs. number of qubits.
 
-### Funciones Auxiliares
-### Script Principal (`grover-qsimov-main.py`)
+### Main Script (`grover_qsimov_main.py`)
 
-- **Propósito**: Orquesta la ejecución de la aplicación, configurando núcleos, manejando argumentos y coordinando las clases.
-- **Funciones Clave**:
-    - `set_active_cores(cores)`: Configura el número de núcleos activos mediante variables de entorno y afinidad de CPU.
-    - `main()`: Parsea argumentos, configura el entorno, ejecuta el algoritmo para cada número de qubits y guarda los resultados.
+- **Purpose**: Orchestrates the application's execution, parsing arguments, configuring resources, and coordinating classes.
+- **Key Functions**:
+  - `main()`: Parses command-line arguments, sets up the results directory, configures CPU cores, and runs the algorithm for each combination of qubits and iterations. It also initializes monitors, saves results, and generates plots.
+- **Features**:
+  - Supports ranges for qubits and iterations.
+  - Creates unique result directories to avoid overwriting (e.g., `results_4_qubits_512_iterations_2_cores`).
+  - Validates input arguments to ensure qubits are greater than 2 and iterations are non-zero.
+  - Defaults to all available cores if `--cores` is set to -1.
 
-### Flujo de la Aplicación
+## Application Flow
 
-1. **Parseo de Argumentos**: Lee los argumentos de línea de comandos (`n`, `num_iterations`, `--cores`, `--no-ram`, `--no-cpu`).
-2. **Configuración de Núcleos**: Ajusta los núcleos de CPU a utilizar con `set_active_cores()`.
-3. **Creación del Directorio de Resultados**: Genera un directorio único (por ejemplo, `results_4_qubits_512_iterations_2_cores`) para almacenar los datos.
-4. **Monitoreo Continuo de RAM (si está habilitado)**: Inicia un hilo para registrar el uso de RAM en tiempo real.
-5. **Ejecución por Cada `n`**:
-    - Crea una instancia de `GroverRunner` y ejecuta el algoritmo.
-    - Recopila tiempos y estadísticas de recursos.
-    - Usa `ResultsHandler` para mostrar tablas y guardar datos en CSV.
-6. **Finalización**: Genera gráficos de uso de RAM y guarda la salida de la consola.
+1. **Argument Parsing**: Reads command-line arguments (`n`, `num_iterations`, `--cores`, `--no-ram`, `--no-cpu`).
+2. **Results Directory Creation**: Generates a unique directory based on the number of qubits, iterations, and cores.
+3. **Core Configuration**: Limits the number of CPU cores to the available count or uses all cores if set to -1.
+4. **Execution for Each `n` and `num_iterations`**:
+   - Initializes `CPUMonitor` and `RAMMonitor` (if enabled).
+   - Creates a `GroverRunner` instance to execute the algorithm.
+   - Collects timing and resource usage statistics.
+   - Uses `ResultsHandler` to display tables and save data to CSV.
+5. **Plot Generation**: Creates plots for real-time RAM usage, average RAM usage vs. number of qubits, and Grover's execution time vs. number of qubits.
+6. **Completion**: Saves the console output to `out.txt`.
 
-### Notas Adicionales
+## Output Files
 
-- **Reinicio del Estado Cuántico**: El estado cuántico se reinicia a `|0>` antes de cada ejecución en `GroverRunner` para garantizar mediciones precisas.
-- **Directorio de Resultados**: Se evita la sobrescritura de resultados añadiendo un índice (por ejemplo, `results_4_qubits_512_iterations_2_cores(1)`).
-- **Monitoreo Opcional**: El monitoreo de CPU y RAM puede desactivarse para ejecuciones más rápidas o en sistemas con recursos limitados
+- **Results CSV** (`Grover_data_qsimov_<n>.csv`): Contains execution data (number of qubits, iterations, Grover's time, standard deviation, CPU/RAM usage, etc.).
+- **Real-Time RAM CSV** (`ram_usage_n<n>.csv`): Logs RAM usage in MB over time.
+- **Plots**:
+  - `ram_usage_n<n>.png`: Plot of real-time RAM usage over time.
+  - `Grover_data_qsimov_<n>_ram_avg_qubits.png`: Plot of average RAM usage vs. number of qubits.
+  - `Grover_data_qsimov_<n>_t_grover_qubits.png`: Plot of Grover's execution time vs. number of qubits.
+- **Console Output** (`out.txt`): Log of all console output.
+
+## Notes
+
+- Real-time RAM monitoring is commented out in the main script (`grover_qsimov_main.py`). To enable it, uncomment the relevant lines in the `main()` function.
+- The application automatically stops if the estimated execution time exceeds one day (`t_grover > 8640` seconds).
+- Ensure the results directory does not already exist, as the script generates a new one with a unique name.
+- The `plot_ram_usage_from_csv` function in `ResourceMonitor.py` may encounter issues with time parsing due to the format used in `real_time_memory_usage`. Consider updating the time format or error handling for robustness.
+- The `qsimov` library uses a custom quantum machine (`Drewom`) with configurable threads, which is optimized for parallel execution based on the specified number of cores.
